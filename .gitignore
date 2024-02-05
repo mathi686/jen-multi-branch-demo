@@ -1,6 +1,6 @@
 # Local .terraform directories
 **/.terraform/*
-./credantial.tf
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
