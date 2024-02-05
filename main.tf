@@ -1,7 +1,7 @@
 resource "aws_vpc" "new_proj" {
-  cidr_block = "10.0.0.0/16"
-  
+  cidr_block = var.aws_vpc
+
   tags = {
     Name = "newvpc"
-  }  
+  }
 }
