@@ -18,6 +18,7 @@ crash.*.log
 
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in
+credantial.tf
 override.tf
 override.tf.json
 *_override.tf
@@ -27,7 +28,7 @@ override.tf.json
 # !example_override.tf
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
-# example: *tfplan*
+# example: *tfplan*q
 
 # Ignore CLI configuration files
 .terraformrc
