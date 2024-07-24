@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testereplicadata
+  labels:
+    app: nginx
+    env: uat
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      version: "3"
+      app: pointing-it
+  template:
+    metadata:
+      name: testtemp
+      labels:
+        app: pointing-it
+        version: "3"
+    spec:
+      nodeSelector: #
+        env: prod   #
+      containers:
+        - name: testcont
+          image: nginx:1.23.0
+          ports:
+            - containerPort: 80

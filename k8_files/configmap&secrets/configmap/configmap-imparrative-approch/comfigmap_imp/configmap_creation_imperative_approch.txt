@@ -1,0 +1,1 @@
+kubectl create configmap my-config --from-literal=mysql_root_password=root@123 --from-literal=mysql_user=mathi --from-literal=mysql_db=mathitestdb --from-literal=mysql_user_passwd=admin@123

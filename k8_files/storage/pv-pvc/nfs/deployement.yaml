@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkind-deployment  # Corrected field name
+spec:
+  selector:
+    matchLabels:
+      app: cicd-master
+      env: uat
+  template:
+    metadata:
+      name: jenkins-demo
+      labels:
+        app: cicd-master
+        env: uat
+    spec:
+      containers:
+        - name: cicd-master
+          image: jenkins/jenkins:lts
+          ports:
+            - name: cicd-port
+              containerPort: 8080
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
+      volumes:
+        - name: jenkins-data
+          persistentVolumeClaim:
+            claimName: jenkins-pvc
+
+
+

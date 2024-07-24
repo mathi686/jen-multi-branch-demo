@@ -1,0 +1,81 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: testereplicadata5
+#   labels:
+#     app: nginx
+#     env: uat
+#   #namespace: testns
+# spec:
+#   replicas: 4
+#   selector:
+#     matchLabels:
+#       version: "3"
+#       app: pointing-it
+#   template:
+#     metadata:
+#       name: testtemp
+#       labels:
+#         app: pointing-it
+#         version: "3"
+#     spec:
+#       containers:
+#         - name: testcont
+#           image: phpimage:latest
+#           ports:
+#             - containerPort: 80
+#           env:
+#             - name: DOCKER_USERNAME
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: myregistrykey
+#                   key: username
+#             - name: DOCKER_PASSWORD
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: myregistrykey
+#                   key: password
+#           resources:
+#             requests:
+#               memory: "250Mi"  # Adjust as needed
+#               cpu: "250m"     # Adjust as needed
+#             limits:
+#               memory: "500Mi" # Adjust as needed
+#               cpu: "500m"     # Adjust as needed
+          
+      
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ng-service
+spec:
+  selector:
+    app: pointing-it
+  ports:
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testereplicadata5
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testereplicadata5
+  template:
+    metadata:
+      labels:
+        app: testereplicadata5
+    spec:
+      containers:
+      - name: testereplicadata5-container
+        image: mathi686/phpimage:latest # Ensure this image exists
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: myregistrykey
+

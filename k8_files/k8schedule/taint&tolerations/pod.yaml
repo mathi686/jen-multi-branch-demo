@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginix-pd-demo
+  labels:
+    app: nginix
+    env: dev
+spec:
+  nodeName: kubemaster #
+  containers:
+  - name: demo-container
+    image: nginx:latest
+    ports:
+    - name: container-port
+      containerPort: 80
+      protocol: TCP

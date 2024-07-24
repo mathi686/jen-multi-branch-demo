@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginix-pd-demo-v2
+  labels:
+    app: nginix
+    env: dev
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: env
+            operator: In
+            values:
+            - dev01
+        topologyKey: kubernetes.io/hostname  # Corrected topologyKey
+  containers:
+  - name: demo-container
+    image: nginx:latest
+    ports:
+    - name: container-port
+      containerPort: 80
+      protocol: TCP

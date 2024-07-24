@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+  labels:
+    app: mysqldb
+    type: mysql
+    env: prod
+spec:
+  selector:
+    matchLabels:
+      app: mysqldb
+  template:
+    metadata:
+      name: mysql-demo
+      labels:
+        app: mysqldb
+        type: mysql
+        env: prod
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:latest
+        env: 
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: my-config
+                key: mysql_root_password
+          - name: MYSQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: my-config
+                key: mysql_db
+          - name: MYSQL_USER
+            valueFrom:
+              configMapKeyRef:
+                name: my-config
+                key: mysql_user
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: my-config
+                key: mysql_user_passwd
+         
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: shared-data
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+
+
+
+
+      
+

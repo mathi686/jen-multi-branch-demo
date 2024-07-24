@@ -1,0 +1,13 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-test
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: testereplicadataone
+  minReplicas: 3
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 1
+  

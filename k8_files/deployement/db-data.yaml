@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-data-sql
+data:
+  MYSQL_DATABASE: mathitestdb
+  MYSQL_PASSWORD: admin@123
+  MYSQL_ROOT_PASSWORD: root@123
+  MYSQL_USER: mathi 
+
+ 

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-pv-nfs
+  labels:
+    env: dev
+spec:
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: gp2
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    server: 192.168.76.128
+    path: /var/nfsshare/jenkins-data
+
+   
