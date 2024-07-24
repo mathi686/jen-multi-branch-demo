@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-deployment  # Corrected field name
+spec:
+  selector:
+    matchLabels:
+      app: cicd-master
+      env: uat
+  template:
+    metadata:
+      name: jenkins-demo
+      labels:
+        app: cicd-master
+        env: uat
+    spec:
+      containers:
+        - name: cicd-master
+          image: jenkins/jenkins:lts
+          ports:
+            - name: cicd-port
+              containerPort: 8080
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
+            - name: jenkins-secret
+              mountPath: /var/jenkins_secret
+              #readOnly: true
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            allowPrivilegeEscalation: true
+      volumes:
+        - name: jenkins-data
+          persistentVolumeClaim:
+            claimName: jenkins-pvc
+        - name: jenkins-secret
+          secret:
+            secretName: jenkins-secret
+
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jenkins-secret
+type: Opaque
+data:
+  username: YWRtaW4=  # Base64-encoded value for 'admin'
+  password: bXlzZWNyZXRwYXNzd29yZA==  # Base64-encoded value for 'mysupersecret'
+
+
+
