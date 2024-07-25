@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Git check out ') {
+            steps{
+         git (
+            url: 'https://github.com/mathi686/jen-multi-branch-demo.git'
+         ) 
+        }
+        }
+
+        stage('maven build') {
+         steps {
+           script {
+         bat  'mvn install'
+           }
+         }
+        }
+
+        stage('Docker build') {
+          steps {
+            script {
+           bat 'docker build  -t mynewtestapp:latest . '
+          }
+        }
+        }
+         
+        
+    }
+}
