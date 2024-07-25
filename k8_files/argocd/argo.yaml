@@ -5,12 +5,12 @@ metadata:
   namespace: argocd  # Specify the desired namespace for the Argo CD Application
 spec:
   destination:
-    server: 'https://kubernetes.default.svc'
+    server: 'https://192.168.49.2:8443'
     namespace: 'default'
   project: default
   source:
-    repoURL: 'https://github.com/mathi686/k8manifest.git'
-    path: 'deployement'
+    repoURL: 'https://github.com/mathi686/jen-multi-branch-demo.git'
+    path: 'deployment'
     targetRevision: 'main'
   syncPolicy:
     automated:

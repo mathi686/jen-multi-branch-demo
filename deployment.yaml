@@ -1,47 +1,45 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apps/v1       # Specifies the API version for the Deployment
+kind: Deployment          # Indicates that this resource is a Deployment
 metadata:
-  name: testereplicadata5
+  name: testereplicadata5 # The name of the Deployment
   labels:
-    app: nginx
-    env: uat
-  #namespace: testns
+    app: nginx            # Label for categorization; here, it represents the app name 'nginx'
+    env: uat              # Label indicating the environment, 'uat' (User Acceptance Testing)
+  # namespace: testns     # (Optional) The namespace where the Deployment is created; commented out, so it defaults to the 'default' namespace
 spec:
-  replicas: 4
+  replicas: 4             # Number of pod replicas to run; here, 4 replicas
   selector:
-    matchLabels:
-      version: "3"
-      app: pointing-it
+    matchLabels:          # Criteria for selecting pods managed by the Deployment
+      version: "3"        # Pods must have the label 'version: "3"' to be selected
+      app: pointing-it    # Pods must have the label 'app: pointing-it' to be selected
   template:
     metadata:
-      name: testtemp
+      name: testtemp      # The name assigned to the pods (optional)
       labels:
-        app: pointing-it
-        version: "3"
+        app: pointing-it  # Label added to the pods; represents the app name
+        version: "3"      # Label added to the pods; represents the version
     spec:
       containers:
-        - name: testcont
-          image: nginx:1.23.0
+        - name: testcont           # Name of the container
+          image: nginx:1.23.0      # Docker image to use for the container; 'nginx' version 1.23.0
           ports:
-            - containerPort: 80
+            - containerPort: 80    # Port to expose on the container; here, port 80
           resources:
             requests:
-              memory: "250Mi"  # Adjust as needed
-              cpu: "250m"     # Adjust as needed
+              memory: "250Mi"      # Minimum memory requested by the container; 250 MiB
+              cpu: "250m"          # Minimum CPU requested by the container; 250 millicores
             limits:
-              memory: "500Mi" # Adjust as needed
-              cpu: "500m"     # Adjust as needed
-
-      
+              memory: "500Mi"      # Maximum memory the container can use; 500 MiB
+              cpu: "500m"          # Maximum CPU the container can use; 500 millicores
 ---
-apiVersion: v1
-kind: Service
+apiVersion: v1              # Specifies the API version for the Service
+kind: Service               # Indicates that this resource is a Service
 metadata:
-  name: ng-service
+  name: ng-service          # The name of the Service
 spec:
   selector:
-    app: pointing-it
+    app: pointing-it        # The Service targets pods with this label; 'app: pointing-it'
   ports:
-    - port: 80
-      targetPort: 80
-  type: LoadBalancer
+    - port: 80              # The port the Service will expose; here, port 80
+      targetPort: 80        # The port on the pod to forward traffic to; here, port 80
+  type: LoadBalancer        # Specifies the type of Service; 'LoadBalancer' exposes the Service externally using a cloud provider's load balancer

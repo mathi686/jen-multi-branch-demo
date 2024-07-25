@@ -1,0 +1,120 @@
+pipeline {
+    agent any
+
+    environment {
+        // Define environment variables for JFrog, Docker, SonarQube, and ECR
+        ARTIFACTORY_URL = 'https://your-jfrog-instance/artifactory'
+        ARTIFACTORY_REPO = 'your-repo'
+        ARTIFACTORY_USER = credentials('artifactory-username')
+        ARTIFACTORY_PASS = credentials('artifactory-password')
+        DOCKER_REGISTRY = 'your-docker-registry'
+        DOCKER_CREDENTIALS_ID = 'docker-credentials-id'
+        GIT_CREDENTIALS_ID = 'my-git-credentials' // Git credentials ID
+        SONARQUBE_SERVER = 'my-sonarqube-server'  // SonarQube server name configured in Jenkins
+        SONARQUBE_PROJECT_KEY = 'my-project-key'  // Project key in SonarQube
+        SONARQUBE_PROJECT_NAME = 'my-project-name' // Project name in SonarQube
+        SONARQUBE_TOKEN = credentials('sonarqube-token') // SonarQube token configured in Jenkins
+        AWS_REGION = 'your-aws-region'
+        ECR_REPOSITORY = 'your-ecr-repo'
+        AWS_CREDENTIALS_ID = 'aws-credentials-id'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from your repository using credentials
+                git(
+                    url: 'https://github.com/your-repo.git',
+                    credentialsId: "${GIT_CREDENTIALS_ID}"
+                )
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                // Run SonarQube analysis
+                script {
+                    def scannerHome = tool 'SonarQube Scanner' // Name of SonarQube Scanner installation in Jenkins
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        sh "${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} \
+                            -Dsonar.projectName=${SONARQUBE_PROJECT_NAME} \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=https://your-sonarqube-server \
+                            -Dsonar.login=${SONARQUBE_TOKEN}"
+                    }
+                }
+            }
+        }
+
+        stage('Maven Build') {
+            steps {
+                // Build the application with Maven
+                echo 'Building with Maven...'
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Upload to JFrog Artifactory') {
+            steps {
+                // Upload artifacts to JFrog Artifactory
+                echo 'Uploading artifacts to JFrog Artifactory...'
+                script {
+                    def server = Artifactory.server(ARTIFACTORY_URL)
+                    def uploadSpec = """{
+                        "files": [
+                            {
+                                "pattern": "target/*.jar",
+                                "target": "${ARTIFACTORY_REPO}/path/to/your/artifact/",
+                                "props": "build.number=${env.BUILD_NUMBER}"
+                            }
+                        ]
+                    }"""
+                    server.upload(uploadSpec, 'mvn-artifacts')
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                // Build Docker image
+                echo 'Building Docker image...'
+                sh 'docker build -t my-app:${env.BUILD_NUMBER} .'
+            }
+        }
+
+        stage('Authenticate with ECR') {
+            steps {
+                // Authenticate Docker to ECR
+                withAWS(credentials: "${AWS_CREDENTIALS_ID}", region: "${AWS_REGION}") {
+                    sh 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com'
+                }
+            }
+        }
+
+        stage('Docker Push to ECR') {
+            steps {
+                // Push Docker image to ECR
+                echo 'Pushing Docker image to ECR...'
+                withAWS(credentials: "${AWS_CREDENTIALS_ID}", region: "${AWS_REGION}") {
+                    sh 'docker tag my-app:${env.BUILD_NUMBER} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest'
+                    sh 'docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline succeeded!'
+        }
+
+        failure {
+            echo 'Pipeline failed!'
+        }
+
+        always {
+            echo 'Pipeline completed.'
+        }
+    }
+}
