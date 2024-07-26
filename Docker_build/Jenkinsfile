@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+      MAVEN_HOME = tool name: 'Maven 3.9.8', type: 'hudson.tasks.Maven$MavenInstallation'
+        PATH = "${env.MAVEN_HOME}\\bin;${env.PATH}"
+    }
+
     stages {
         stage('Git check out ') {
             steps{
@@ -13,7 +18,7 @@ pipeline {
         stage('maven build') {
          steps {
            script {
-         bat  'mvn install'
+         bat "${MAVEN_HOME}\\bin\\
            }
          }
         }
